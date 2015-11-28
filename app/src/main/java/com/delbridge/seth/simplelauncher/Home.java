@@ -1,6 +1,7 @@
 package com.delbridge.seth.simplelauncher;
 
 import android.app.Activity;
+import android.app.Service;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -15,10 +16,13 @@ public class Home extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(locked)
-            setContentView(R.layout.activity_home2);
-        else
-            showApps(null);
+        startService(new Intent(Home.this, UpdateService.class));
+        setContentView(R.layout.activity_home2);
+
+//        if(locked)
+//            setContentView(R.layout.activity_home2);
+//        else
+//            showApps(null);
     }
 
     public void showApps(View v){

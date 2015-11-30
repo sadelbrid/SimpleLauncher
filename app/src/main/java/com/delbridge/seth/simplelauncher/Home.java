@@ -76,6 +76,7 @@ public class Home extends Activity {
             if(error_count > numErrorsAllowed){
                 //send email
                 Log.i("emailalert", "sending email");
+                sendEmail();
             }
         }
     }
@@ -84,5 +85,12 @@ public class Home extends Activity {
     protected void onDestroy(){
         Log.i("DestroyAlert", "destroying home");
         super.onDestroy();
+    }
+
+    /*
+    Email should contain a front camera capture, GPS coordinates
+     */
+    private void sendEmail(){
+
     }
 }

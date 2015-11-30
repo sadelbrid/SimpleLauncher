@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:key="email"
+        android:title="Email"
+        android:summary="Set the email address the application sends alerts to"
+        android:defaultValue="sadelbrid@gmail.com"
+        android:inputType="textEmailAddress"
+        />
+
+    <ListPreference
+        android:key="tolerance"
+        android:title="Tolerance"
+        android:summary="Set the maximum amount of errors the lock screen will tolerate."
+        android:defaultValue="3"
+        android:entries="@array/errorLimitOptions"
+        android:entryValues="@array/errorLimitValues"
+
+        />
+
+</PreferenceScreen>

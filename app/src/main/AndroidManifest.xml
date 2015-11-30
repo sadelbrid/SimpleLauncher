@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.delbridge.seth.simplelauncher" >
+
     <application>
         <activity
             android:name=".Home"
@@ -20,9 +21,18 @@
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
         </activity>
 
-        <service android:name=".UpdateService">
-
+        <service android:name=".UpdateService" >
         </service>
+
+        <activity
+            android:name=".Settings"
+            android:label="@string/title_activity_settings" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

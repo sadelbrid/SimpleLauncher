@@ -7,20 +7,31 @@ import android.preference.PreferenceManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 import android.view.WindowManager;
-
+import android.os.CountDownTimer;
+import android.widget.TextView;
 
 public class Home extends Activity {
     static boolean locked = true;
     public static SharedPreferences sharedPreferences;
     public static final String KEY = "password";
 
+    public CountDownTimer timer;
+    public boolean lockedOut;
+    public long timeLeft;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i("Create", String.valueOf(timeLeft));
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        lockedOut = sharedPreferences.getBoolean("lockedOut", false);
+        timeLeft = sharedPreferences.getLong("timeLeft", 0);
+
         startService(new Intent(Home.this, UpdateService.class));
         setContentView(R.layout.activity_home2);
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
@@ -38,6 +49,38 @@ public class Home extends Activity {
                 return false;
             }
         });
+
+        int tolerance = Integer.parseInt(sharedPreferences.getString("tolerance", "1"));
+        final TextView lockOutput = (TextView)findViewById(R.id.lockOutput);
+        final TextView passwordInput = (TextView)findViewById(R.id.passwordInput);
+
+        long duration = tolerance*60000;
+        if(lockedOut){
+            duration = timeLeft;
+        }
+
+        timer = new CountDownTimer(duration, 1000){
+            public void onTick(long millisUntilFinished){
+                String minutes = String.valueOf(millisUntilFinished/60000);
+                String seconds = String.valueOf(millisUntilFinished%60000/1000);
+                if(Integer.parseInt(seconds)<10){
+                    seconds = "0"+seconds;
+                }
+                lockOutput.setText("Phone locked for\n"+minutes+":"+seconds);
+                lockedOut = true;
+                timeLeft = millisUntilFinished;
+            }
+
+            public void onFinish(){
+                lockOutput.setText("");
+                passwordInput.setEnabled(true);
+                lockedOut=false;
+            }
+        };
+
+        if(lockedOut){
+            timer.start();
+        }
     }
 
     public void showApps(){
@@ -77,12 +120,11 @@ public class Home extends Activity {
                 editor.apply();
             }
 
-
-            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
             int numErrorsAllowed = Integer.parseInt(sharedPreferences.getString("tolerance", "1"));
 
             int error_count = sharedPreferences.getInt("errorCount", 0);
-            if(error_count > numErrorsAllowed){
+            if(error_count >= numErrorsAllowed){
+                lockOut();
                 //send email
                 Log.i("emailalert", "sending email");
                 sendEmail();
@@ -96,10 +138,36 @@ public class Home extends Activity {
         super.onDestroy();
     }
 
+    @Override
+    protected void onResume(){
+        super.onResume();
+    }
+
+    @Override
+    public void onBackPressed(){
+
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putLong("timeLeft", timeLeft);
+        editor.putBoolean("lockedOut", lockedOut);
+        editor.apply();
+    }
+
     /*
     Email should contain a front camera capture, GPS coordinates
      */
     private void sendEmail(){
 
+    }
+
+    //Lock homescreen for @tolerance minutes
+    private void lockOut(){
+        EditText passwordInput = (EditText)findViewById(R.id.passwordInput);
+        passwordInput.setEnabled(false);
+        timer.start();
     }
 }

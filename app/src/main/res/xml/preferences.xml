@@ -4,7 +4,7 @@
         android:key="email"
         android:title="Email"
         android:summary="Set the email address the application sends alerts to"
-        android:defaultValue="sadelbrid@gmail.com"
+        android:defaultValue=""
         android:inputType="textEmailAddress"
         />
 

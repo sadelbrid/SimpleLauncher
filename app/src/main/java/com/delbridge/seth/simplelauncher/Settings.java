@@ -1,6 +1,8 @@
 package com.delbridge.seth.simplelauncher;
 
 import android.app.Activity;
+import android.preference.PreferenceActivity;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,7 +10,6 @@ import android.view.MenuItem;
 
 
 public class Settings extends Activity {
-    public static final String PREFS_NAME = "SettingsPrefs";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

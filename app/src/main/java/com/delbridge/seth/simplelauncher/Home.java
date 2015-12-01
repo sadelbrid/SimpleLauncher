@@ -14,12 +14,13 @@ import android.view.WindowManager;
 
 public class Home extends Activity {
     static boolean locked = true;
-    public static final String PREFS_NAME = "HomePrefs";
+    public static SharedPreferences sharedPreferences;
     public static final String KEY = "password";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         startService(new Intent(Home.this, UpdateService.class));
         setContentView(R.layout.activity_home2);
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
@@ -40,7 +41,7 @@ public class Home extends Activity {
     }
 
     public void showApps(){
-        String key = getSharedPreferences(PREFS_NAME, 0).getString(KEY, "");
+        String key = sharedPreferences.getString(KEY, "");
         EditText password = (EditText)findViewById(R.id.passwordInput);
         Log.i("Passwords", password.getText().toString() + ", " + key);
         if(password.getText().toString().equals(key)) {
@@ -48,8 +49,7 @@ public class Home extends Activity {
 
 
             //Reset to 0
-            SharedPreferences homeprefs = getSharedPreferences(PREFS_NAME, 0);
-            SharedPreferences.Editor editor = homeprefs.edit();
+            SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putInt("errorCount", 0);
             editor.apply();
 
@@ -61,28 +61,27 @@ public class Home extends Activity {
             //Wrong input
             password.getText().clear();
             //Increment error count
-            SharedPreferences homeprefs = getSharedPreferences(PREFS_NAME, 0);
-            if(homeprefs.contains("errorCount")){
+            if(sharedPreferences.contains("errorCount")){
                 //Get old value
-                int errorCount = homeprefs.getInt("errorCount", 0);
+                int errorCount = sharedPreferences.getInt("errorCount", 0);
                 //Put incremented value
                 errorCount++;
-                SharedPreferences.Editor editor = homeprefs.edit();
+                SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putInt("errorCount", errorCount);
                 editor.apply();
-                Log.i("newvalue", "" + homeprefs.getInt("errorCount", 0));
+                Log.i("newvalue", "" + sharedPreferences.getInt("errorCount", 0));
             }
             else{
-                SharedPreferences.Editor editor = homeprefs.edit();
+                SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putInt("errorCount", 1);
                 editor.apply();
             }
 
 
             SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-            int numErrorsAllowed = Integer.parseInt(settings.getString("tolerance", "1"));
+            int numErrorsAllowed = Integer.parseInt(sharedPreferences.getString("tolerance", "1"));
 
-            int error_count = homeprefs.getInt("errorCount", 0);
+            int error_count = sharedPreferences.getInt("errorCount", 0);
             if(error_count > numErrorsAllowed){
                 //send email
                 Log.i("emailalert", "sending email");

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="activation2.activation2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/activation2/activation2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

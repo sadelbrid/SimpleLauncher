@@ -23,6 +23,7 @@
         android:ems="10"
         android:id="@+id/passwordInput"
         android:layout_centerVertical="true"
+        android:imeOptions="actionGo"
         android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

@@ -123,20 +123,18 @@ public class Home extends Activity {
     Email should contain a front camera capture, GPS coordinates
      */
     private void sendEmail() {
-
+        //email and password of the email sender
         final GMailSender sender = new GMailSender("androidtestingosu@gmail.com", "apptesting123");
         new AsyncTask<Void, Void, Void>() {
             @Override
             public Void doInBackground(Void... arg) {
                 try {
-                    /**send emails to two recipients. I tested this and figure
-                     * the first email should be gmail and the second should be yahoo.
-                     * it doesnt work any other way
+                    /**send email to the given recipient
                      */
                     sender.sendMail("LockScreen Alert ",
                             "Someone tried to access your mobile device.",
-                            "sachinda.liyana@gmail.com",
-                            "saber_syl@yahoo.com");
+                            "androidtestingosu@gmail.com",
+                            "sachinda.yl@gmail.com");
                 } catch (Exception e) {
                     Log.e("SendMail", e.getMessage(), e);
 

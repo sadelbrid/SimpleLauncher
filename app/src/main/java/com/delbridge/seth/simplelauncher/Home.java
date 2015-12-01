@@ -7,7 +7,6 @@ import android.preference.PreferenceManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 import android.view.WindowManager;
@@ -26,14 +25,14 @@ public class Home extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i("Create", String.valueOf(timeLeft));
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         lockedOut = sharedPreferences.getBoolean("lockedOut", false);
         timeLeft = sharedPreferences.getLong("timeLeft", 0);
 
         startService(new Intent(Home.this, UpdateService.class));
         setContentView(R.layout.activity_home2);
+
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
         final EditText edittext = (EditText) findViewById(R.id.passwordInput);
@@ -54,9 +53,11 @@ public class Home extends Activity {
         final TextView lockOutput = (TextView)findViewById(R.id.lockOutput);
         final TextView passwordInput = (TextView)findViewById(R.id.passwordInput);
 
-        long duration = tolerance*60000;
+        long duration = Long.parseLong(sharedPreferences.getString("lockTime", "1"))*60000;
+        Log.i("duration", String.valueOf(duration));
         if(lockedOut){
             duration = timeLeft;
+            passwordInput.setEnabled(false);
         }
 
         timer = new CountDownTimer(duration, 1000){

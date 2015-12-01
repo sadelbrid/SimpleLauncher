@@ -8,6 +8,14 @@
         android:inputType="textEmailAddress"
         />
 
+    <EditTextPreference
+        android:key="password"
+        android:title="Password"
+        android:summary="Your password!"
+        android:inputType="numberPassword"
+        android:maxLength="4"
+        />
+
     <ListPreference
         android:key="tolerance"
         android:title="Tolerance"
@@ -15,6 +23,16 @@
         android:defaultValue="3"
         android:entries="@array/errorLimitOptions"
         android:entryValues="@array/errorLimitValues"
+
+        />
+
+    <ListPreference
+        android:key="lockTime"
+        android:title="Lock Out Time"
+        android:summary="Set the duration of the lock out when the tolerance is reached."
+        android:defaultValue="3"
+        android:entries="@array/lockOutTimeValues"
+        android:entryValues="@array/lockOutTimeValues"
 
         />
 

@@ -13,4 +13,11 @@
         <item>5</item>
         <item>10</item>
     </string-array>
+
+    <string-array name="lockOutTimeValues">
+        <item>1</item>
+        <item>3</item>
+        <item>5</item>
+        <item>10</item>
+    </string-array>
 </resources>

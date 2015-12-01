@@ -1,38 +1,48 @@
 package com.delbridge.seth.simplelauncher;
 
 import android.app.Activity;
-import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
+import android.view.WindowManager;
 
 
 public class Home extends Activity {
     static boolean locked = true;
-    static String key = "1234";
     public static final String PREFS_NAME = "HomePrefs";
+    public static final String KEY = "password";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         startService(new Intent(Home.this, UpdateService.class));
         setContentView(R.layout.activity_home2);
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
-//        if(locked)
-//            setContentView(R.layout.activity_home2);
-//        else
-//            showApps(null);
+        final EditText edittext = (EditText) findViewById(R.id.passwordInput);
+        edittext.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // If the event is a key-down event on the "enter" button
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    // Perform action on key press
+                    showApps();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
-    public void showApps(View v){
+    public void showApps(){
+        String key = getSharedPreferences(PREFS_NAME, 0).getString(KEY, "");
         EditText password = (EditText)findViewById(R.id.passwordInput);
+        Log.i("Passwords", password.getText().toString() + ", " + key);
         if(password.getText().toString().equals(key)) {
             password.getText().clear();
 

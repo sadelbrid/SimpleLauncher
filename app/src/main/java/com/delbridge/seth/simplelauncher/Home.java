@@ -8,13 +8,10 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-<<<<<<< HEAD
 import android.view.WindowManager;
 import android.os.CountDownTimer;
 import android.widget.TextView;
@@ -31,9 +28,7 @@ import com.google.android.gms.location.LocationServices;
 
 public class Home extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private static int REQUEST_CODE_RECOVER_PLAY_SERVICES = 200;
-    EditText password;
     static boolean locked = true;
-<<<<<<< HEAD
     public static SharedPreferences sharedPreferences;
     public static final String KEY = "password";
 
@@ -61,8 +56,6 @@ public class Home extends Activity implements GoogleApiClient.ConnectionCallback
 
         startService(new Intent(Home.this, UpdateService.class));
         setContentView(R.layout.activity_home2);
-
-<<<<<<< HEAD
 
         if (checkGooglePlayServices()) {
             buildGoogleApiClient();
@@ -191,6 +184,7 @@ public class Home extends Activity implements GoogleApiClient.ConnectionCallback
     @Override
     public void onPause(){
         super.onPause();
+        stopLocationUpdates();
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putLong("timeLeft", timeLeft);
         editor.putBoolean("lockedOut", lockedOut);
@@ -245,12 +239,6 @@ public class Home extends Activity implements GoogleApiClient.ConnectionCallback
             );
             AppIndex.AppIndexApi.start(client, viewAction);
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        stopLocationUpdates();
     }
 
     @Override

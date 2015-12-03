@@ -3,6 +3,10 @@ package com.delbridge.seth.simplelauncher;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.graphics.SurfaceTexture;
+import android.hardware.Camera;
 import android.preference.PreferenceManager;
 import android.location.Location;
 import android.net.Uri;
@@ -26,12 +30,15 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.io.File;
+import java.io.IOException;
+
 public class Home extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private static int REQUEST_CODE_RECOVER_PLAY_SERVICES = 200;
     static boolean locked = true;
     public static SharedPreferences sharedPreferences;
     public static final String KEY = "password";
-
+    public static String pictureDir = "";
     public CountDownTimer timer;
     public boolean lockedOut;
     public long timeLeft;
@@ -45,7 +52,9 @@ public class Home extends Activity implements GoogleApiClient.ConnectionCallback
     private boolean mRequestingLocationUpdates = false;
     private String latitude = "";
     private String longitude = "";
-
+    private Camera camera;
+    private int cameraId;
+    private SurfaceTexture cameraTexture;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,6 +120,30 @@ public class Home extends Activity implements GoogleApiClient.ConnectionCallback
         if(lockedOut){
             timer.start();
         }
+
+        //Camera
+        cameraTexture = new SurfaceTexture(99);
+//        if (!getPackageManager()
+//                .hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+//            Toast.makeText(this, "No camera on this device", Toast.LENGTH_LONG)
+//                    .show();
+//        } else {
+//            cameraId = findFrontFacingCamera();
+//            if (cameraId < 0) {
+//                Toast.makeText(this, "No front facing camera found.",
+//                        Toast.LENGTH_LONG).show();
+//            } else {
+//                Log.i("CameraHome", "camera init");
+//
+//                camera = Camera.open(cameraId);
+//                try {
+//                    camera.setPreviewTexture(cameraTexture);
+//                }
+//                catch(IOException e){
+//                    Log.i("CameraHome", "could not set camera preview");
+//                }
+//            }
+//        }
     }
 
     public void showApps(){
@@ -173,7 +206,29 @@ public class Home extends Activity implements GoogleApiClient.ConnectionCallback
 
     @Override
     protected void onResume(){
+        if (!getPackageManager()
+                .hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+            Toast.makeText(this, "No camera on this device", Toast.LENGTH_LONG)
+                    .show();
+        } else {
+            cameraId = findFrontFacingCamera();
+            if (cameraId < 0) {
+                Toast.makeText(this, "No front facing camera found.",
+                        Toast.LENGTH_LONG).show();
+            } else {
+                Log.i("CameraHome", "camera init");
+
+                camera = Camera.open(cameraId);
+                try {
+                    camera.setPreviewTexture(cameraTexture);
+                }
+                catch(IOException e){
+                    Log.i("CameraHome", "could not set camera preview");
+                }
+            }
+        }
         super.onResume();
+
     }
 
     @Override
@@ -183,18 +238,28 @@ public class Home extends Activity implements GoogleApiClient.ConnectionCallback
 
     @Override
     public void onPause(){
-        super.onPause();
         stopLocationUpdates();
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putLong("timeLeft", timeLeft);
         editor.putBoolean("lockedOut", lockedOut);
         editor.apply();
+        if (camera != null) {
+            camera.stopPreview();
+            camera.release();
+            camera = null;
+        }
+        super.onPause();
     }
 
     /*
     Email should contain a front camera capture, GPS coordinates
      */
     private void sendEmail() {
+        //Take picture
+        camera.startPreview();
+        camera.takePicture(null, null,
+                new PhotoHandler(getApplicationContext()));
+        //camera.release();
         //email and password of the email sender
         final GMailSender sender = new GMailSender("androidtestingosu@gmail.com", "apptesting123");
         new AsyncTask<Void, Void, Void>() {
@@ -203,10 +268,14 @@ public class Home extends Activity implements GoogleApiClient.ConnectionCallback
                 try {
                     /**send email to the given recipient
                      */
+                    String email = sharedPreferences.getString("email", "");
+                    File picture = new File(pictureDir);
+                    Log.i("pictureDir", pictureDir);
                     sender.sendMail("LockScreen Alert ",
                             "Someone tried to access your mobile device.\n Your device is located at\n Latitude: " + latitude + " Longitude: " + longitude + "\n http://maps.google.com/maps?q=" + latitude + "," + longitude,
                             "androidtestingosu@gmail.com",
-                            "sachinda.yl@gmail.com");
+                            email,
+                            picture);
                 } catch (Exception e) {
                     Log.e("SendMail", e.getMessage(), e);
 
@@ -369,5 +438,21 @@ public class Home extends Activity implements GoogleApiClient.ConnectionCallback
         EditText passwordInput = (EditText)findViewById(R.id.passwordInput);
         passwordInput.setEnabled(false);
         timer.start();
+    }
+
+    private int findFrontFacingCamera() {
+        int cameraId = -1;
+        // Search for the front facing camera
+        int numberOfCameras = Camera.getNumberOfCameras();
+        for (int i = 0; i < numberOfCameras; i++) {
+            Camera.CameraInfo info = new Camera.CameraInfo();
+            Camera.getCameraInfo(i, info);
+            if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                Log.d("CameraHome", "Camera found");
+                cameraId = i;
+                break;
+            }
+        }
+        return cameraId;
     }
 }
